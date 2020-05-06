@@ -107,15 +107,16 @@ public class Table_Topics_API {
 
 		Connection conn;
 		try {
-			conn = DriverManager.getConnection((props.getProperty("db.url")+props.getProperty("db.hostName")+":"+props.getProperty("db.portName")+"/"+props.getProperty("db.databaseName")),props.getProperty("db.username"),props.getProperty("db.password"));
+			Class.forName("org.postgresql.Driver");
+			conn = DriverManager.getConnection((props.getProperty("db.url")+props.getProperty("db.hostName")+":"+props.getProperty("db.portName")+"/"+props.getProperty("db.databaseName")+"?sslmode=require"),props.getProperty("db.username"),props.getProperty("db.password"));
 		query.append("SELECT TT_id from table_topics_list");
-		if(Cat01Array != null || Cat02Array != null || Cat03Array != null)
+		if(!Cat01Array.isEmpty() || !Cat02Array.isEmpty() || !Cat03Array.isEmpty())
 		query.append(" WHERE ((");
 		
 		if(Cat01Array !=null) {
 		for(int x=0;x<Cat01Array.size();x++) {
-		for(int y=0;y<10;y++)
-			query.append("category_0"+(y+1)+"="+"'"+Cat01Array.get(x)+"'"+" or ");
+		for(int y=1;y<10;y++)
+			query.append("category_0"+(y)+"="+"'"+Cat01Array.get(x)+"'"+" or ");
 		
 		query.append("category_10='"+Cat01Array.get(x)+"')");
 		if(Cat01Array.size() > x+1)
@@ -125,7 +126,7 @@ public class Table_Topics_API {
 		}
 		}
 		
-		if(Cat02Array !=null) {
+		if(!Cat02Array.isEmpty()) {
 			query.append(" or ((");			
 			for(int x=0;x<Cat02Array.size();x++) {
 			for(int y=0;y<10;y++)
@@ -139,7 +140,7 @@ public class Table_Topics_API {
 			}
 			}
 		
-		if(Cat03Array !=null) {
+		if(!Cat03Array.isEmpty()) {
 			query.append(" or ((");	
 			for(int x=0;x<Cat03Array.size();x++) {
 			for(int y=0;y<10;y++)
@@ -153,6 +154,8 @@ public class Table_Topics_API {
 			}
 			}
 		query.append(";");	
+		 System.out.println("THEE Statement"+query.toString());  
+
 		
 		Statement stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 		rs = stmt.executeQuery(query.toString());
@@ -188,19 +191,18 @@ public class Table_Topics_API {
 				TT_id_Count.add(finalRS.getInt("tt_id"));
 				tableTopicList.add(finalRS.getString("tt_questions"));
 			}
-			
+			System.out.println("TOPIC!!!: "+tableTopicList.get(0));
 			JSONArray tableTopicArray = new JSONArray();
-			JSONObject tableTopicObject = new JSONObject();
 			for(int x=0; x < TT_id_Count.size();x++) {
+			JSONObject tableTopicObject = new JSONObject();
 			tableTopicObject.put("Topic_id", TT_id_Count.get(x));
 			tableTopicObject.put("Table_Topic", tableTopicList.get(x));
 			tableTopicArray.add(tableTopicObject);
-			tableTopicObject.clear();
 			}
-			tableTopicFullObject.put("Topics", tableTopicObject);
+			tableTopicFullObject.put("Topics", tableTopicArray);
 			tableTopicFullObject.put("Message", message);
 			tableTopicFullObject.put("Confirmation", confirmation);
-		} catch (SQLException e) {
+		} catch (SQLException | ClassNotFoundException e) {
 			confirmation = "Connection Error!";
 			message = "There was an issue with the Database Connection";
 			tableTopicFullObject.put("Message", message);

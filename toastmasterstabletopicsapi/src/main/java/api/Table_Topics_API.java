@@ -2,6 +2,7 @@ package api;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -11,6 +12,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Properties;
@@ -84,8 +87,6 @@ public class Table_Topics_API {
 				// TODO Auto-generated catch block
 				e2.printStackTrace();
 			}
-
-			 System.out.println("GOT MY PATH"+path.getParent());  
 			 
 		ArrayList<Integer> TT_id_Count = new ArrayList<Integer>();
 		 ResourceBundle reader = null; 
@@ -111,50 +112,60 @@ public class Table_Topics_API {
 			conn = DriverManager.getConnection((props.getProperty("db.url")+props.getProperty("db.hostName")+":"+props.getProperty("db.portName")+"/"+props.getProperty("db.databaseName")+"?sslmode=require"),props.getProperty("db.username"),props.getProperty("db.password"));
 		query.append("SELECT TT_id from table_topics_list");
 		if(!Cat01Array.isEmpty() || !Cat02Array.isEmpty() || !Cat03Array.isEmpty())
-		query.append(" WHERE ((");
+		query.append(" WHERE ('");
 		
-		if(Cat01Array !=null) {
+		if(!Cat01Array.isEmpty()) {
 		for(int x=0;x<Cat01Array.size();x++) {
-		for(int y=1;y<10;y++)
-			query.append("category_0"+(y)+"="+"'"+Cat01Array.get(x)+"'"+" or ");
+			query.append(Cat01Array.get(x));
+			query.append("' in (");
+		for(int y=1;y<10;y++) 
+			query.append("category_0"+(y)+", ");
 		
-		query.append("category_10='"+Cat01Array.get(x)+"')");
+		query.append("category_10)");
 		if(Cat01Array.size() > x+1)
-			query.append(" and (");
+			query.append(" and '");
 		else 
 			query.append(")");
 		}
+		if(!Cat02Array.isEmpty())
+			query.append(" or ('");	
+			
 		}
 		
 		if(!Cat02Array.isEmpty()) {
-			query.append(" or ((");			
 			for(int x=0;x<Cat02Array.size();x++) {
-			for(int y=0;y<10;y++)
-				query.append("category_0"+(y+1)+"="+"'"+Cat02Array.get(x)+"'"+" or ");
+				query.append(Cat02Array.get(x));
+				query.append("' in (");
+			for(int y=1;y<10;y++) 
+				query.append("category_0"+(y)+", ");
 			
-			query.append("category_10='"+Cat02Array.get(x)+"')");
+			query.append("category_10)");
 			if(Cat02Array.size() > x+1)
-				query.append(" and (");
+				query.append(" and '");
 			else 
 				query.append(")");
 			}
+			if(!Cat03Array.isEmpty())
+				query.append(" or ('");	
+				
 			}
 		
 		if(!Cat03Array.isEmpty()) {
-			query.append(" or ((");	
 			for(int x=0;x<Cat03Array.size();x++) {
-			for(int y=0;y<10;y++)
-				query.append("category_0"+(y+1)+"="+"'"+Cat03Array.get(x)+"'"+" or ");
+				query.append(Cat03Array.get(x));
+				query.append("' in (");
+			for(int y=1;y<10;y++) 
+				query.append("category_0"+(y)+", ");
 			
-			query.append("category_10='"+Cat03Array.get(x)+"')");
+			query.append("category_10)");
 			if(Cat03Array.size() > x+1)
-				query.append(" and (");
+				query.append(" and '");
 			else 
 				query.append(")");
 			}
-			}
+		}
 		query.append(";");	
-		 System.out.println("THEE Statement"+query.toString());  
+		 System.out.println("THEE Statement: "+query.toString());  
 
 		
 		Statement stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
@@ -162,41 +173,56 @@ public class Table_Topics_API {
 		//rs.next();
 		while(rs.next()) {
 			TT_id_Count.add(rs.getInt("tt_id"));
+			System.out.println("id: "+ rs.getInt("tt_id"));
 		}
 		if(TT_id_Count.size() < count) {
 			confirmation = "Not Enough Topics";
 			message = "Your query did not produce enough table topics. You requested "+ Integer.toString(count)+" Table Topics, but your requested categories only could produce "+ Integer.toString(TT_id_Count.size())+" Table Topics.";
 			count = TT_id_Count.size();
 		}
-		Random randNum = new Random();
+		System.out.println("Check1: "+ TT_id_Count);
+		
+		 Collections.shuffle(TT_id_Count); 
+		System.out.println("Check2: "+ TT_id_Count);
+		System.out.println("Check3: "+ TT_id_Count.get(0));
+
+		
+		/*Random randNum = new Random();
 	      Set<Integer>set = new LinkedHashSet<Integer>();
 	      while (set.size() < count) {
-	         set.add(randNum.nextInt(TT_id_Count.size())+1);
-	      }
+	         set.add(TT_id_Count.get(randNum.nextInt(TT_id_Count.size())+1));
+				System.out.println("Random: " + randNum.nextInt(TT_id_Count.size())+1);
+	      }*/
 	      StringBuilder finalQuery = new StringBuilder();
 	      finalQuery.append("SELECT tt_id, tt_questions FROM table_topics_list WHERE tt_id IN (");
 	      String comma = "";
-	      for(int tempCount : set) {
+	      for(int x=0;x<count;x++) {
 		      finalQuery.append(comma);
-		      finalQuery.append(tempCount);
+		      finalQuery.append(TT_id_Count.get(x));
+
 		      comma = ", ";   	  
 	      }
+			System.out.println("Check4: "+ finalQuery.toString());
+
 	      finalQuery.append(");");
 	      Statement finalStmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			ResultSet finalRS = finalStmt.executeQuery(finalQuery.toString());
-			TT_id_Count.clear();
+			//TT_id_Count.clear();
+		    ArrayList<Integer> final_TT_id_Count = new ArrayList<Integer>();
 			ArrayList<String> tableTopicList = new ArrayList<String>();
 			//finalRS.next();
 			while(finalRS.next()) {
-				TT_id_Count.add(finalRS.getInt("tt_id"));
+				final_TT_id_Count.add(finalRS.getInt("tt_id"));
 				tableTopicList.add(finalRS.getString("tt_questions"));
+				System.out.println("id2: "+ finalRS.getInt("tt_id"));
 			}
-			System.out.println("TOPIC!!!: "+tableTopicList.get(0));
 			JSONArray tableTopicArray = new JSONArray();
-			for(int x=0; x < TT_id_Count.size();x++) {
+			for(int x=0; x < count;x++) {
 			JSONObject tableTopicObject = new JSONObject();
 			tableTopicObject.put("Topic_id", TT_id_Count.get(x));
-			tableTopicObject.put("Table_Topic", tableTopicList.get(x));
+			tableTopicObject.put("Table_Topic", tableTopicList.get(findIndex(final_TT_id_Count, TT_id_Count.get(x))));
+			//tableTopicObject.put("Table_Topic", tableTopicList.get(x));
+			//tableTopicObject.put("Table_Topic", tableTopicList.get(x));
 			tableTopicArray.add(tableTopicObject);
 			}
 			tableTopicFullObject.put("Topics", tableTopicArray);
@@ -213,5 +239,13 @@ public class Table_Topics_API {
 			return tableTopicFullObject;
 	      
 	   }
+	
+	public static int findIndex(ArrayList<Integer> tableTopicList, int t) 
+    { 
+  
+        int index = Arrays.binarySearch(tableTopicList.toArray(), t); 
+        return (index < 0) ? -1 : index; 
+    } 
+	
 
 }

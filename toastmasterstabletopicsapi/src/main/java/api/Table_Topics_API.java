@@ -20,7 +20,6 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.Set;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.http.MediaType;

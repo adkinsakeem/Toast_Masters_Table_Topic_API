@@ -82,26 +82,26 @@ public class Table_Topics_API {
 			 
 		ArrayList<Integer> TT_id_Count = new ArrayList<Integer>();
 		 StringBuilder query = new StringBuilder();
-		 Properties props = new Properties();  
+		/* Properties props = new Properties();  
 		  
 		 try {
 			props.load(new FileInputStream(".dbconfig.properties"));
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		}
+		}*/
 		 
 		 
 		    //reader = ResourceBundle.getBundle(".dbconfig.properties");
 			ResultSet rs;
 			//int playerCount = 0;
 			//ArrayList <String> players = new ArrayList <String>();
-
 		Connection conn;
 		try {
 			Class.forName("org.postgresql.Driver");
-			conn = DriverManager.getConnection((props.getProperty("db.url")+props.getProperty("db.hostName")+":"+props.getProperty("db.portName")+"/"+props.getProperty("db.databaseName")+"?sslmode=require"),props.getProperty("db.username"),props.getProperty("db.password"));
-		query.append("SELECT TT_id from table_topics_list");
+			conn = DriverManager.getConnection(System.getenv().get("DATABASE_URL").toString()+"?sslmode=require",System.getenv().get("USER").toString(),System.getenv().get("PASSWORD").toString());
+			//conn = DriverManager.getConnection((props.getProperty("db.url")+props.getProperty("db.hostName")+":"+props.getProperty("db.portName")+"/"+props.getProperty("db.databaseName")+"?sslmode=require"),props.getProperty("db.username"),props.getProperty("db.password"));
+			query.append("SELECT TT_id from table_topics_list");
 		if(!Cat01Array.isEmpty() || !Cat02Array.isEmpty() || !Cat03Array.isEmpty())
 		query.append(" WHERE ('");
 		

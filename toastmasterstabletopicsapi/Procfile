@@ -1,2 +1,2 @@
-web: java -jar -Dserver.port=$PORT target/toastmasterstabletopicsapi-0.0.1-SNAPSHOT.jar
+web: java -jar -Dserver.port=$PORT target/toastmasterstabletopicsapi-0.8.1-SNAPSHOT.jar
 javac -cp  /usr/share/jetty/lib/servlet-api-2.5.jar:<path-to>/json-simple-1.1.1.jar

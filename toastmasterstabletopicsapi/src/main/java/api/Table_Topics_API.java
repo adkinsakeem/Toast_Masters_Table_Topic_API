@@ -228,10 +228,17 @@ public class Table_Topics_API {
 			tableTopicFullObject.put("Message", message);
 			tableTopicFullObject.put("Confirmation", confirmation);
 		} catch (SQLException | ClassNotFoundException e) {
+			if(count <=0) {
+				confirmation = "Request Number Error!";
+				message = "You need to request at least one table topic.";
+				tableTopicFullObject.put("Message", message);
+				tableTopicFullObject.put("Confirmation", confirmation);
+			}else {
 			confirmation = "Connection Error!";
 			message = "There was an issue with the Database Connection";
 			tableTopicFullObject.put("Message", message);
 			tableTopicFullObject.put("Confirmation", confirmation);
+			}
 			e.printStackTrace();
 		}
 				

@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.heroku.apps</groupId>
   <artifactId>toastmasterstabletopicsapi</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.8.1-SNAPSHOT</version>
   <name>ToastMasters Table Topics API</name>
   <description>This is an API that allows someone to get random table topics from a database based on categories chosen.</description>
   <parent>

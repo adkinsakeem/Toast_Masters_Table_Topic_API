@@ -1,11 +1,5 @@
 package api;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.lang.reflect.Array;
-import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -14,16 +8,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Properties;
-import java.util.Random;
-import java.util.ResourceBundle;
-import java.util.Set;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,13 +26,6 @@ public class Table_Topics_API {
 	@ResponseBody
 	public String testFunction() {
 		return "test";
-	}
-	
-	@RequestMapping(value = "/test2", method = RequestMethod.GET,
-	        produces = MediaType.APPLICATION_JSON_VALUE)
-	@ResponseBody
-	public String testFunction2(@RequestParam("count") String count) {
-		return "test/ "+ count;
 	}
 	
 	@RequestMapping(value = "/randomTopic", method = RequestMethod.GET,
@@ -69,7 +49,6 @@ public class Table_Topics_API {
 			Cat03Array.add(tempCat);	
 			}
 		return getTopicsFromDB(count, Cat01Array, Cat02Array, Cat03Array);
-
 	}
 	
 	
@@ -82,20 +61,8 @@ public class Table_Topics_API {
 			 
 		ArrayList<Integer> TT_id_Count = new ArrayList<Integer>();
 		 StringBuilder query = new StringBuilder();
-		/* Properties props = new Properties();  
-		  
-		 try {
-			props.load(new FileInputStream(".dbconfig.properties"));
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}*/
-		 
-		 
-		    //reader = ResourceBundle.getBundle(".dbconfig.properties");
+
 			ResultSet rs;
-			//int playerCount = 0;
-			//ArrayList <String> players = new ArrayList <String>();
 		Connection conn;
 		try {
 			Class.forName("org.postgresql.Driver");
@@ -156,34 +123,20 @@ public class Table_Topics_API {
 			}
 		}
 		query.append(";");	
-		 System.out.println("THEE Statement: "+query.toString());  
-
 		
 		Statement stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 		rs = stmt.executeQuery(query.toString());
-		//rs.next();
 		while(rs.next()) {
 			TT_id_Count.add(rs.getInt("tt_id"));
-			System.out.println("id: "+ rs.getInt("tt_id"));
 		}
 		if(TT_id_Count.size() < count) {
 			confirmation = "Not Enough Topics";
 			message = "Your query did not produce enough table topics. You requested "+ Integer.toString(count)+" Table Topics, but your requested categories only could produce "+ Integer.toString(TT_id_Count.size())+" Table Topics.";
 			count = TT_id_Count.size();
 		}
-		System.out.println("Check1: "+ TT_id_Count);
 		
 		 Collections.shuffle(TT_id_Count); 
-		System.out.println("Check2: "+ TT_id_Count);
-		System.out.println("Check3: "+ TT_id_Count.get(0));
 
-		
-		/*Random randNum = new Random();
-	      Set<Integer>set = new LinkedHashSet<Integer>();
-	      while (set.size() < count) {
-	         set.add(TT_id_Count.get(randNum.nextInt(TT_id_Count.size())+1));
-				System.out.println("Random: " + randNum.nextInt(TT_id_Count.size())+1);
-	      }*/
 	      StringBuilder finalQuery = new StringBuilder();
 	      finalQuery.append("SELECT tt_id, tt_questions FROM table_topics_list WHERE tt_id IN (");
 	      String comma = "";
@@ -193,27 +146,21 @@ public class Table_Topics_API {
 
 		      comma = ", ";   	  
 	      }
-			System.out.println("Check4: "+ finalQuery.toString());
 
 	      finalQuery.append(");");
 	      Statement finalStmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			ResultSet finalRS = finalStmt.executeQuery(finalQuery.toString());
-			//TT_id_Count.clear();
 		    ArrayList<Integer> final_TT_id_Count = new ArrayList<Integer>();
 			ArrayList<String> tableTopicList = new ArrayList<String>();
-			//finalRS.next();
 			while(finalRS.next()) {
 				final_TT_id_Count.add(finalRS.getInt("tt_id"));
 				tableTopicList.add(finalRS.getString("tt_questions"));
-				System.out.println("id2: "+ finalRS.getInt("tt_id"));
 			}
 			JSONArray tableTopicArray = new JSONArray();
 			for(int x=0; x < count;x++) {
 			JSONObject tableTopicObject = new JSONObject();
 			tableTopicObject.put("Topic_id", TT_id_Count.get(x));
 			tableTopicObject.put("Table_Topic", tableTopicList.get(findIndex(final_TT_id_Count, TT_id_Count.get(x))));
-			//tableTopicObject.put("Table_Topic", tableTopicList.get(x));
-			//tableTopicObject.put("Table_Topic", tableTopicList.get(x));
 			tableTopicArray.add(tableTopicObject);
 			}
 			tableTopicFullObject.put("Topics", tableTopicArray);
@@ -240,10 +187,7 @@ public class Table_Topics_API {
 	
 	public static int findIndex(ArrayList<Integer> tableTopicList, int t) 
     { 
-  
         int index = Arrays.binarySearch(tableTopicList.toArray(), t); 
         return (index < 0) ? -1 : index; 
     } 
-	
-
 }

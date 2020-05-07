@@ -99,7 +99,7 @@ public class Table_Topics_API {
 		Connection conn;
 		try {
 			Class.forName("org.postgresql.Driver");
-			conn = DriverManager.getConnection(System.getenv().get("DATABASE_URL"),System.getenv().get("USER"),System.getenv().get("PASSWORD"));
+			conn = DriverManager.getConnection(System.getenv().get("DB_CONNECTION"),System.getenv().get("USER"),System.getenv().get("PASSWORD"));
 			//conn = DriverManager.getConnection((props.getProperty("db.url")+props.getProperty("db.hostName")+":"+props.getProperty("db.portName")+"/"+props.getProperty("db.databaseName")+"?sslmode=require"),props.getProperty("db.username"),props.getProperty("db.password"));
 			query.append("SELECT TT_id from table_topics_list");
 		if(!Cat01Array.isEmpty() || !Cat02Array.isEmpty() || !Cat03Array.isEmpty())

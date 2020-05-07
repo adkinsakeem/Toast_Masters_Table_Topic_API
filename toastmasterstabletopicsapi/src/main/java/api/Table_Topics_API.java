@@ -79,16 +79,8 @@ public class Table_Topics_API {
 		String message = "We were able to produce your requested table topics";
 		String confirmation = "OK";
 		
-		 Path path = null;
-			try {
-				path = Paths.get(Table_Topics_API.class.getResource(".").toURI());
-			} catch (URISyntaxException e2) {
-				// TODO Auto-generated catch block
-				e2.printStackTrace();
-			}
 			 
 		ArrayList<Integer> TT_id_Count = new ArrayList<Integer>();
-		 ResourceBundle reader = null; 
 		 StringBuilder query = new StringBuilder();
 		 Properties props = new Properties();  
 		  

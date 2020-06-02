@@ -63,7 +63,7 @@ public class Table_Topics_API {
 		 StringBuilder query = new StringBuilder();
 
 			ResultSet rs;
-		Connection conn;
+		Connection conn = null;
 		try {
 			Class.forName("org.postgresql.Driver");
 			conn = DriverManager.getConnection(System.getenv().get("DB_CONNECTION"),System.getenv().get("USER"),System.getenv().get("PASSWORD"));
@@ -179,6 +179,15 @@ public class Table_Topics_API {
 			tableTopicFullObject.put("Confirmation", confirmation);
 			}
 			e.printStackTrace();
+		}finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				confirmation = "Connection Error!";
+				message = "There was an issue with the Database Connection";
+				tableTopicFullObject.put("Message", message);
+				tableTopicFullObject.put("Confirmation", confirmation);
+			}
 		}
 				
 			return tableTopicFullObject;
